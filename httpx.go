@@ -35,7 +35,8 @@ func HandleHTTPError(expose bool) HTTPErrorHandlerFunc {
 			Message: http.StatusText(http.StatusInternalServerError),
 		}
 		errors.As(err, &e)
-		res.Status(e.Code)
+
+		res.Status(e.Code) // affects the code in middlewares where after H is called
 
 		if expose {
 			e.Message = err.Error()
@@ -56,7 +57,10 @@ func HandleHTTPError(expose bool) HTTPErrorHandlerFunc {
 
 type contextKey string
 
-var requestKey = contextKey("request")
+var (
+	requestKey = contextKey("request")
+	errorKey   = contextKey("error")
+)
 
 // HandlerFunc is an adapter to allow the use of ordinary functions as HTTP handlers,
 // with *Request and *Responder as parameters.
@@ -66,6 +70,9 @@ type HandlerFunc func(req *Request, res *Responder) error
 
 // ServeHTTP wraps http.Request into Request and http.ResponseWriter into Responder
 // before passing them into and call h(req, res).
+//
+// Since this function is called once for each handler and middleware,
+// error returned on each layer is handled immediately.
 func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	req, ok := r.Context().Value(requestKey).(*Request)
 	if !ok {
@@ -77,14 +84,23 @@ func (h HandlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		res = NewResponder(w)
 	}
 	if err := h(req, res); err != nil {
+		// store error in request context
+		// for H to retrieve the error
+		// and pass it up to middlewares
+		req.SetValue(errorKey, err)
 		HTTPErrorHandler(req, res, err)
 	}
 }
 
 // H is a convenient adapter that wraps the translation of http.Handler to HandlerFunc.
+// It returns the error returned by the handler for the caller (typically a middleware) to handle it.
 func H(handler http.Handler) HandlerFunc {
 	return func(req *Request, res *Responder) error {
 		handler.ServeHTTP(res, req.Request)
+		err, ok := req.GetValue(errorKey).(error)
+		if ok {
+			return err
+		}
 		return nil
 	}
 }
