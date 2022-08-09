@@ -1,9 +1,6 @@
 package httpx
 
-import (
-	"fmt"
-	"net/http"
-)
+import "net/http"
 
 // HTTP Errors
 var (
@@ -54,7 +51,7 @@ func (e *HTTPError) Error() string {
 	if e.Err != nil {
 		return e.Err.Error()
 	}
-	return fmt.Sprintf("%s (%d)", e.Message, e.Code)
+	return e.Message
 }
 
 // WithError returns the same HTTPError instance with err set to HTTPError.err field
