@@ -11,11 +11,12 @@ import (
 const defaultMaxMemory = 32 << 20 // 32 MB
 
 // RequestBinder is used to bind request body data to objects.
-// Set this global variable to your preferred binder once
-// before calling any Request.Bind. Defaults to nil.
+// Set this global variable to your preferred binder once before
+// calling any Request.Bind. The default DefaultRequestBinder binds data
+// according to the "Content-Type" header.
 var RequestBinder interface {
 	Bind(req *Request, v any) error
-}
+} = new(DefaultRequestBinder)
 
 // Request wraps an *http.Request.
 // See: https://golang.org/pkg/net/http/#Request
