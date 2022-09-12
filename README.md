@@ -1,7 +1,8 @@
 # httpx
 
-![Go Reference](https://pkg.go.dev/badge/github.com/tnychn/httpx.svg)
-![GitHub](https://img.shields.io/github/license/tnychn/httpx)
+[![Go Reference](https://pkg.go.dev/badge/github.com/tnychn/httpx.svg)](https://pkg.go.dev/github.com/tnychn/httpx)
+[![Tag](https://img.shields.io/github/v/tag/tnychn/httpx)](https://github.com/tnychn/httpx/tags)
+[![License](https://img.shields.io/github/license/tnychn/httpx)](./LICENSE.txt)
 
 _A simple and convenient `net/http` wrapper with an [Echo](https://github.com/labstack/echo)-like interface._
 
@@ -36,8 +37,7 @@ from Echo's `Context` at the same time, but without other bloat and dependencies
 
 ## Roadmap
 
-- [x] ~~Request Data Binding~~
-  - [x] exposed a `RequestBinder` interface instead
+- [x] Request Data Binding
 - [ ] File Responder Methods
 - [ ] Real IP Extractor
 - [ ] Graceful Shutdown
