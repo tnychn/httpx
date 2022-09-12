@@ -1,6 +1,9 @@
 package httpx
 
-import "net/http"
+import (
+	"net/http"
+	"strings"
+)
 
 // HTTP Errors
 var (
@@ -27,9 +30,9 @@ type HTTPError struct {
 
 // NewHTTPError creates a new HTTPError instance.
 func NewHTTPError(code int, message ...string) *HTTPError {
-	e := &HTTPError{Code: code, Message: http.StatusText(code)}
+	e := &HTTPError{Code: code, Message: strings.ToLower(http.StatusText(code))}
 	if len(message) > 0 {
-		e.Message = message[0]
+		e.Message = strings.Join(message, ": ")
 	}
 	return e
 }
